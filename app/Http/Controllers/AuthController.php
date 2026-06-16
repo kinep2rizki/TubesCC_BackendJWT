@@ -129,4 +129,63 @@ class AuthController extends Controller
 
         return response()->json($users);
     }
+
+    /**
+     * Find user by email or create new.
+     */
+    public function findOrCreate(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'name' => 'required|string|max:255'
+        ]);
+
+        $user = User::firstOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => $request->name, 
+                'password' => Hash::make(uniqid()) // Random password for manually added users
+            ]
+        );
+
+        if ($user->wasRecentlyCreated) {
+            $user->assignRole('User');
+        }
+
+        $user->load('roles');
+        return response()->json($user);
+    }
+
+    /**
+     * Find user by email.
+     */
+    public function findByEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->with('roles')->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json($user);
+    }
+
+    /**
+     * Search users by name or email.
+     */
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword', '');
+
+        if (empty($keyword)) {
+            return response()->json([]);
+        }
+
+        $users = User::where('name', 'like', "%{$keyword}%")
+            ->orWhere('email', 'like', "%{$keyword}%")
+            ->pluck('id');
+
+        return response()->json($users);
+    }
 }

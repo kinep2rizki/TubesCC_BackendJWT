@@ -19,6 +19,7 @@ class ProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
+            'bio' => 'sometimes|nullable|string|max:1000',
             'avatar' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -28,6 +29,10 @@ class ProfileController extends Controller
 
         if ($request->has('name')) {
             $user->name = $request->name;
+        }
+
+        if ($request->has('bio')) {
+            $user->bio = $request->bio;
         }
 
         // Handle physical file upload for avatar
