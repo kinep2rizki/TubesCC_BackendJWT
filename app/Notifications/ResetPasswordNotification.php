@@ -42,10 +42,11 @@ class ResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Reset Password Notification')
-            ->line('You are receiving this email because we received a password reset request for your account.')
+            ->greeting('Halo, ' . $notifiable->name . '!')
+            ->subject('Pemberitahuan Reset Password - PETA')
+            ->line('Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.')
             ->action('Reset Password', $this->url)
-            ->line('This password reset link will expire in 60 minutes.')
-            ->line('If you did not request a password reset, no further action is required.');
+            ->line('Link reset password ini akan kadaluarsa dalam 60 menit.')
+            ->line('Jika Anda tidak merasa meminta reset password, Anda tidak perlu melakukan apa-apa.');
     }
 }

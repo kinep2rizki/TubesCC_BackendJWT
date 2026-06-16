@@ -42,9 +42,10 @@ class VerifyEmailNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Verify Email Address')
-            ->line('Please click the button below to verify your email address.')
-            ->action('Verify Email Address', $this->url)
-            ->line('If you did not create an account, no further action is required.');
+            ->greeting('Halo, ' . $notifiable->name . '!')
+            ->subject('Verifikasi Alamat Email Anda - PETA')
+            ->line('Terima kasih telah bergabung! Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda.')
+            ->action('Verifikasi Email', $this->url)
+            ->line('Jika Anda tidak membuat akun ini, Anda tidak perlu melakukan apa-apa.');
     }
 }
