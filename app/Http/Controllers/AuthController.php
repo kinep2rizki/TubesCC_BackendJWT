@@ -11,16 +11,6 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
-    }
-
-    /**
      * Register a new user.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -43,8 +33,8 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Default role assignment if needed, you can add it here.
-        // $user->assignRole('Member');
+        // Default global role assignment
+        $user->assignRole('User');
 
         $token = auth('api')->login($user);
 
@@ -118,5 +108,25 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
+    }
+
+    /**
+     * Get a batch of users by their IDs.
+     * Useful for inter-service communication (data stitching).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUsersBatch(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return response()->json([], 200);
+        }
+
+        // Fetch users and their global roles
+        $users = User::whereIn('id', $ids)->with('roles')->get();
+
+        return response()->json($users);
     }
 }
