@@ -16,8 +16,14 @@ class UserController extends Controller
 
         if ($request->has('search') && !empty($request->search)) {
             $search = strtolower($request->search);
-            $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+            $query->where(function($q) use ($search) {
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
                   ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"]);
+            });
+        }
+
+        if ($request->has('user_ids') && is_array($request->user_ids)) {
+            $query->whereIn('id', $request->user_ids);
         }
 
         // Return users with their roles eager-loaded (Spatie)
